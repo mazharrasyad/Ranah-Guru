@@ -20,9 +20,28 @@ $config = [
             'cost' => 12,
             'admins' => ['admin']
         ],
+        'admin' => [
+            'class' => 'mdm\admin\Module',  
+            'layout' => 'left-menu',
+            'mainLayout' => '@app/views/layouts/main.php',          
+        ]
     ],
     'homeUrl' => '/Web-Ranah-Guru',
+    'as access' => [
+        'class' => 'mdm\admin\components\AccessControl',
+        'allowActions' => [
+            'site/*',
+            // 'admin/*',
+            'gii/*',
+            'user/*',
+            'user/security/login',            
+            'user/security/logout',
+        ]
+    ],
     'components' => [
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager', // or use 'yii\rbac\PhpManager'
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'tEgc8kb30U_-ymsIr5mBor_0iv_Lyu2Q',

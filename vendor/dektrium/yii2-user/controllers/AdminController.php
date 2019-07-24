@@ -14,6 +14,7 @@ namespace dektrium\user\controllers;
 use dektrium\user\filters\AccessRule;
 use dektrium\user\Finder;
 use dektrium\user\models\Profile;
+use dektrium\user\models\School;
 use dektrium\user\models\User;
 use dektrium\user\models\UserSearch;
 use dektrium\user\helpers\Password;
@@ -79,17 +80,11 @@ class AdminController extends Controller
      */
     const EVENT_AFTER_IMPERSONATE = 'afterImpersonate';
 
-    /**
-     * Event is triggered before updating existing user's profile.
-     * Triggered with \dektrium\user\events\UserEvent.
-     */
     const EVENT_BEFORE_PROFILE_UPDATE = 'beforeProfileUpdate';
-
-    /**
-     * Event is triggered after updating existing user's profile.
-     * Triggered with \dektrium\user\events\UserEvent.
-     */
     const EVENT_AFTER_PROFILE_UPDATE = 'afterProfileUpdate';
+
+    const EVENT_BEFORE_SCHOOL_UPDATE = 'beforeSCHOOLUpdate';
+    const EVENT_AFTER_SCHOOL_UPDATE = 'afterSCHOOLUpdate';
 
     /**
      * Event is triggered before confirming existing user.
@@ -269,13 +264,6 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing profile.
-     *
-     * @param int $id
-     *
-     * @return mixed
-     */
     public function actionUpdateProfile($id)
     {
         Url::remember('', 'actions-redirect');
@@ -301,6 +289,34 @@ class AdminController extends Controller
         return $this->render('_profile', [
             'user'    => $user,
             'profile' => $profile,
+        ]);
+    }
+
+    public function actionUpdateSchool($id)
+    {
+        Url::remember('', 'actions-redirect');
+        $user    = $this->findModel($id);
+        $school = $user->school;
+
+        if ($school == null) {
+            $school = \Yii::createObject(School::className());
+            $school->link('user', $user);
+        }
+        $event = $this->getSchoolEvent($school);
+
+        $this->performAjaxValidation($school);
+
+        $this->trigger(self::EVENT_BEFORE_SCHOOL_UPDATE, $event);
+
+        if ($school->load(\Yii::$app->request->post()) && $school->save()) {
+            \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'School details have been updated'));
+            $this->trigger(self::EVENT_AFTER_SCHOOL_UPDATE, $event);
+            return $this->refresh();
+        }
+
+        return $this->render('_school', [
+            'user'    => $user,
+            'school' => $school,
         ]);
     }
 

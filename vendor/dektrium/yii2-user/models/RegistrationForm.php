@@ -14,6 +14,7 @@ namespace dektrium\user\models;
 use dektrium\user\traits\ModuleTrait;
 use Yii;
 use yii\base\Model;
+use app\models\Role;
 
 /**
  * Registration form collects user input on registration process, validates it and creates new User model.
@@ -37,6 +38,11 @@ class RegistrationForm extends Model
      * @var string Password
      */
     public $password;
+
+    /**
+     * @var string Role
+     */
+    public $role_id;
 
     /**
      * @inheritdoc
@@ -70,6 +76,14 @@ class RegistrationForm extends Model
             // password rules
             'passwordRequired' => ['password', 'required', 'skipOnEmpty' => $this->module->enableGeneratingPassword],
             'passwordLength'   => ['password', 'string', 'min' => 6, 'max' => 72],
+            // role_id rules
+            'role_idTrim'     => ['role_id', 'trim'],
+            'role_idRequired' => ['role_id', 'required'],
+            [
+                ['role_id'], 'exist', 'skipOnError' => true, 
+                'targetClass' => Role::className(), 
+                'targetAttribute' => ['role_id' => 'id']
+            ],
         ];
     }
 
@@ -82,6 +96,7 @@ class RegistrationForm extends Model
             'email'    => Yii::t('user', 'Email'),
             'username' => Yii::t('user', 'Username'),
             'password' => Yii::t('user', 'Password'),
+            'role_id'  => Yii::t('user', 'Role'),
         ];
     }
 
@@ -136,5 +151,13 @@ class RegistrationForm extends Model
     protected function loadAttributes(User $user)
     {
         $user->setAttributes($this->attributes);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRole()
+    {
+        return $this->hasOne(Role::className(), ['id' => 'role_id']);
     }
 }

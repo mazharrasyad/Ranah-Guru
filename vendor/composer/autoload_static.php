@@ -34,6 +34,10 @@ class ComposerStaticInit60f3865195255f61e2b1efefbaae0968
             'yii\\authclient\\' => 15,
             'yii\\' => 4,
         ),
+        'w' => 
+        array (
+            'webzop\\notifications\\' => 21,
+        ),
         'r' => 
         array (
             'rmrevin\\yii\\fontawesome\\' => 24,
@@ -41,6 +45,18 @@ class ComposerStaticInit60f3865195255f61e2b1efefbaae0968
         'p' => 
         array (
             'phpDocumentor\\Reflection\\' => 25,
+        ),
+        'm' => 
+        array (
+            'mdm\\admin\\' => 10,
+        ),
+        'k' => 
+        array (
+            'kartik\\select2\\' => 15,
+            'kartik\\helpers\\' => 15,
+            'kartik\\growl\\' => 13,
+            'kartik\\date\\' => 12,
+            'kartik\\base\\' => 12,
         ),
         'd' => 
         array (
@@ -141,6 +157,10 @@ class ComposerStaticInit60f3865195255f61e2b1efefbaae0968
         array (
             0 => __DIR__ . '/..' . '/yiisoft/yii2',
         ),
+        'webzop\\notifications\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webzop/yii2-notifications',
+        ),
         'rmrevin\\yii\\fontawesome\\' => 
         array (
             0 => __DIR__ . '/..' . '/rmrevin/yii2-fontawesome',
@@ -150,6 +170,30 @@ class ComposerStaticInit60f3865195255f61e2b1efefbaae0968
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
             1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+        ),
+        'mdm\\admin\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mdmsoft/yii2-admin',
+        ),
+        'kartik\\select2\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-select2/src',
+        ),
+        'kartik\\helpers\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-helpers/src',
+        ),
+        'kartik\\growl\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-growl',
+        ),
+        'kartik\\date\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-datepicker/src',
+        ),
+        'kartik\\base\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-krajee-base/src',
         ),
         'dmstr\\' => 
         array (

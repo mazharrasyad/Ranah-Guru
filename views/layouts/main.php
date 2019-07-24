@@ -4,7 +4,7 @@
 /* @var $content string */
 
 use app\widgets\Alert;
-use yii\helpers\Html;
+use kartik\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
@@ -36,28 +36,71 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Beranda', 'url' => ['/site/index']],
-            ['label' => 'Tentang', 'url' => ['/site/about']],
-            ['label' => 'Sekolah', 'url' => ['/']],
-            ['label' => 'Guru', 'url' => ['/']],            
-            ['label' => 'Kontak', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/user/security/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/user/security/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
-        ],
-    ]);
+    if (Yii::$app->user->identity->role_id == 2) {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Beranda', 'url' => ['/']],                        
+                ['label' => 'Lowongan', 'url' => ['/jobvacancy']],                        
+                Yii::$app->user->isGuest ? 
+                (['label' => 'Masuk', 'url' => ['/user/security/login']]):
+                ['label' => Yii::$app->user->identity->username,
+                    'items' => [
+                        ['label' => 'Profil', 'url' => ['/user/settings/school']],
+                        ['label' => 'Keluar', 'url' => ['/user/security/logout'], 'linkOptions' => ['data-method' => 'post']],
+                    ],
+                ],
+                ['label' => 'Daftar', 
+                    'url' => ['/user/registration/register'], 
+                    'visible' => Yii::$app->user->isGuest
+                ],
+            ],
+        ]);
+    }
+    else if (Yii::$app->user->identity->role_id == 3) {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Beranda', 'url' => ['/']], 
+                ['label' => 'Lowongan '.Html::badge(Yii::$app->user->identity->flags), 'url' => ['/apply/notification'],'encode'=>false],                       
+                Yii::$app->user->isGuest ? 
+                (['label' => 'Masuk', 'url' => ['/user/security/login']]):
+                ['label' => Yii::$app->user->identity->username,
+                    'items' => [
+                        ['label' => 'Profil', 'url' => ['/user/settings/teacher']],
+                        ['label' => 'Keluar', 'url' => ['/user/security/logout'], 'linkOptions' => ['data-method' => 'post']],
+                    ],
+                ],
+                ['label' => 'Daftar', 
+                    'url' => ['/user/registration/register'], 
+                    'visible' => Yii::$app->user->isGuest
+                ],
+            ],
+        ]);
+    }
+    else {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Beranda', 'url' => ['/']],                                        
+                Yii::$app->user->isGuest ?
+                (['label' => 'Masuk', 'url' => ['/user/security/login']]):
+                ['label' => Yii::$app->user->identity->username,
+                    'items' => [
+                        ['label' => 'Profil', 'url' => ['/user/settings/profile']],
+                        ['label' => 'Kelola User', 'url' => ['/user/admin']],
+                        ['label' => 'Kelola RBAC', 'url' => ['/admin']],
+                        ['label' => 'Keluar', 'url' => ['/user/security/logout'], 'linkOptions' => ['data-method' => 'post']],
+                    ],
+                ],
+                ['label' => 'Daftar', 
+                    'url' => ['/user/registration/register'], 
+                    'visible' => Yii::$app->user->isGuest
+                ],
+            ],
+        ]);
+    }
+
     NavBar::end();
     ?>
 
@@ -72,9 +115,9 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; <b>Ranah Guru</b> <?= date('Y') ?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-right"><b>Powered by</b> Fathan - Azhar - Akbar - Raihan - Nafu</p>
     </div>
 </footer>
 

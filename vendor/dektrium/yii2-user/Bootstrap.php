@@ -30,6 +30,8 @@ class Bootstrap implements BootstrapInterface
         'User'             => 'dektrium\user\models\User',
         'Account'          => 'dektrium\user\models\Account',
         'Profile'          => 'dektrium\user\models\Profile',
+        'School'           => 'dektrium\user\models\School',
+        'Teacher'          => 'dektrium\user\models\Teacher',
         'Token'            => 'dektrium\user\models\Token',
         'RegistrationForm' => 'dektrium\user\models\RegistrationForm',
         'ResendForm'       => 'dektrium\user\models\ResendForm',
@@ -51,7 +53,7 @@ class Bootstrap implements BootstrapInterface
                 Yii::$container->set($class, $definition);
                 $modelName = is_array($definition) ? $definition['class'] : $definition;
                 $module->modelMap[$name] = $modelName;
-                if (in_array($name, ['User', 'Profile', 'Token', 'Account'])) {
+                if (in_array($name, ['User', 'Profile', 'School', 'Teacher', 'Token', 'Account'])) {
                     Yii::$container->set($name . 'Query', function () use ($modelName) {
                         return $modelName::find();
                     });
@@ -61,6 +63,8 @@ class Bootstrap implements BootstrapInterface
             Yii::$container->setSingleton(Finder::className(), [
                 'userQuery'    => Yii::$container->get('UserQuery'),
                 'profileQuery' => Yii::$container->get('ProfileQuery'),
+                'schoolQuery' => Yii::$container->get('SchoolQuery'),
+                'teacherQuery' => Yii::$container->get('TeacherQuery'),
                 'tokenQuery'   => Yii::$container->get('TokenQuery'),
                 'accountQuery' => Yii::$container->get('AccountQuery'),
             ]);

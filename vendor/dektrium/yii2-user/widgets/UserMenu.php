@@ -30,15 +30,39 @@ class UserMenu extends Widget
         
         $networksVisible = count(Yii::$app->authClientCollection->clients) > 0;
         
-        $this->items = [
-                ['label' => Yii::t('user', 'Profile'), 'url' => ['/user/settings/profile']],
-                ['label' => Yii::t('user', 'Account'), 'url' => ['/user/settings/account']],
+        if (Yii::$app->user->identity->role_id == 2) {
+            $this->items = [                                  
+                ['label' => Yii::t('user', 'Profil Sekolah'), 'url' => ['/user/settings/school']],  
+                ['label' => Yii::t('user', 'Akun'), 'url' => ['/user/settings/account']],
                 [
                     'label' => Yii::t('user', 'Networks'),
                     'url' => ['/user/settings/networks'],
                     'visible' => $networksVisible
                 ],
             ];
+        }
+        elseif (Yii::$app->user->identity->role_id == 3) {
+            $this->items = [                                  
+                ['label' => Yii::t('user', 'Profil Guru'), 'url' => ['/user/settings/teacher']],  
+                ['label' => Yii::t('user', 'Akun'), 'url' => ['/user/settings/account']],
+                [
+                    'label' => Yii::t('user', 'Networks'),
+                    'url' => ['/user/settings/networks'],
+                    'visible' => $networksVisible
+                ],
+            ];
+        }
+        else{
+            $this->items = [                                  
+                ['label' => Yii::t('user', 'Profile'), 'url' => ['/user/settings/profile']],  
+                ['label' => Yii::t('user', 'Akun'), 'url' => ['/user/settings/account']],
+                [
+                    'label' => Yii::t('user', 'Networks'),
+                    'url' => ['/user/settings/networks'],
+                    'visible' => $networksVisible
+                ],
+            ];
+        }
     }
     
     /**

@@ -11,6 +11,9 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
+use app\models\Role;
+use yii\helpers\ArrayHelper;
 
 /**
  * @var yii\web\View $this
@@ -18,7 +21,7 @@ use yii\widgets\ActiveForm;
  * @var dektrium\user\Module $module
  */
 
-$this->title = Yii::t('user', 'Sign up');
+$this->title = Yii::t('user', 'Daftar');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="row">
@@ -28,11 +31,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
             <div class="panel-body">
-                <?php $form = ActiveForm::begin([
-                    'id' => 'registration-form',
-                    'enableAjaxValidation' => true,
-                    'enableClientValidation' => false,
-                ]); ?>
+                <?php 
+                    $ar_role = ArrayHelper::map(Role::find()->where(['id' => [2,3]])->asArray()->all(),'id','name');            
+                    
+                    $form = ActiveForm::begin([
+                        'id' => 'registration-form',
+                        'enableAjaxValidation' => true,
+                        'enableClientValidation' => false,
+                    ]); 
+                ?>
 
                 <?= $form->field($model, 'email') ?>
 
@@ -42,13 +49,23 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $form->field($model, 'password')->passwordInput() ?>
                 <?php endif ?>
 
-                <?= Html::submitButton(Yii::t('user', 'Sign up'), ['class' => 'btn btn-success btn-block']) ?>
+                <?= $form->field($model, 'role_id')
+                    ->widget(Select2::classname(), [
+                        'data' => $ar_role,
+                        'language' => 'id',
+                        'options' => ['placeholder' => 'Pilih Peran'],
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                        ],
+                    ]) ?>
+
+                <?= Html::submitButton(Yii::t('user', 'Daftar'), ['class' => 'btn btn-success btn-block']) ?>
 
                 <?php ActiveForm::end(); ?>
             </div>
         </div>
         <p class="text-center">
-            <?= Html::a(Yii::t('user', 'Already registered? Sign in!'), ['/user/security/login']) ?>
+            <?= Html::a(Yii::t('user', 'Sudah Punya Akun ? Langsung Masuk Aja'), ['/user/security/login']) ?>
         </p>
     </div>
 </div>

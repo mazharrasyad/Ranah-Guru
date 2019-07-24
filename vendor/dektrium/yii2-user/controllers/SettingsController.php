@@ -11,6 +11,7 @@
 
 namespace dektrium\user\controllers;
 
+use Yii;
 use dektrium\user\Finder;
 use dektrium\user\models\Profile;
 use dektrium\user\models\SettingsForm;
@@ -23,29 +24,17 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use dektrium\user\models\School;
+use dektrium\user\models\Teacher;
+use yii\web\UploadedFile;
 
-/**
- * SettingsController manages updating user settings (e.g. profile, email and password).
- *
- * @property \dektrium\user\Module $module
- *
- * @author Dmitry Erofeev <dmeroff@gmail.com>
- */
 class SettingsController extends Controller
 {
     use AjaxValidationTrait;
     use EventTrait;
 
-    /**
-     * Event is triggered before updating user's profile.
-     * Triggered with \dektrium\user\events\UserEvent.
-     */
     const EVENT_BEFORE_PROFILE_UPDATE = 'beforeProfileUpdate';
 
-    /**
-     * Event is triggered after updating user's profile.
-     * Triggered with \dektrium\user\events\UserEvent.
-     */
     const EVENT_AFTER_PROFILE_UPDATE = 'afterProfileUpdate';
 
     /**
@@ -97,7 +86,7 @@ class SettingsController extends Controller
     const EVENT_AFTER_DELETE = 'afterDelete';
 
     /** @inheritdoc */
-    public $defaultAction = 'profile';
+    public $defaultAction = 'school';
 
     /** @var Finder */
     protected $finder;
@@ -130,7 +119,7 @@ class SettingsController extends Controller
                 'rules' => [
                     [
                         'allow'   => true,
-                        'actions' => ['profile', 'account', 'networks', 'disconnect', 'delete'],
+                        'actions' => ['profile', 'account', 'networks', 'disconnect', 'delete', 'school', 'teacher'],
                         'roles'   => ['@'],
                     ],
                     [
@@ -142,12 +131,7 @@ class SettingsController extends Controller
             ],
         ];
     }
-
-    /**
-     * Shows profile settings form.
-     *
-     * @return string|\yii\web\Response
-     */
+    
     public function actionProfile()
     {
         $model = $this->finder->findProfileById(\Yii::$app->user->identity->getId());
@@ -290,5 +274,105 @@ class SettingsController extends Controller
         \Yii::$app->session->setFlash('info', \Yii::t('user', 'Your account has been completely deleted'));
 
         return $this->goHome();
+    }
+
+    // Sekolah
+
+    const EVENT_BEFORE_SCHOOL_UPDATE = 'beforeSchoolUpdate';
+    const EVENT_AFTER_SCHOOL_UPDATE = 'afterSchoolUpdate';
+
+    public function actionSchool()
+    {
+        $model = $this->finder->findSchoolById(\Yii::$app->user->identity->getId());
+
+        if ($model == null) {
+            $model = \Yii::createObject(School::className());
+            $model->link('user', \Yii::$app->user->identity);
+        }
+
+        $event = $this->getSchoolEvent($model);
+
+        $this->performAjaxValidation($model);
+
+        $this->trigger(self::EVENT_BEFORE_SCHOOL_UPDATE, $event);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->fotoFile = UploadedFile::getInstance($model, 'fotoFile');
+
+            if($model->validate() && !empty($model->fotoFile)){
+                $nama1 = 'foto-'.$model->user_id.'.'.$model->fotoFile->extension;
+                $model->foto = $nama1;
+                $model->save();
+                $model->fotoFile->saveAs('foto/'.$nama1);
+            }
+            else{
+                $model->save();
+            }            
+
+            \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'Profil sekolah berhasil diperbaharui'));
+            $this->trigger(self::EVENT_AFTER_TEACHER_UPDATE, $event);
+            return $this->refresh();
+        }
+
+        return $this->render('school', [
+            'model' => $model,
+        ]);
+    }
+
+    // Guru
+
+    const EVENT_BEFORE_TEACHER_UPDATE = 'beforeTeacherUpdate';
+    const EVENT_AFTER_TEACHER_UPDATE = 'afterTeacherUpdate';
+
+    public function actionTeacher()
+    {
+        $model = $this->finder->findTeacherById(\Yii::$app->user->identity->getId());        
+
+        if ($model == null) {
+            $model = \Yii::createObject(Teacher::classNames());
+            $model->link('user', \Yii::$app->user->identity);
+        }
+
+        $event = $this->getTeacherEvent($model);
+
+        $this->performAjaxValidation($model);
+
+        $this->trigger(self::EVENT_BEFORE_TEACHER_UPDATE, $event);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->cvFile = UploadedFile::getInstance($model, 'cvFile');
+            $model->fotoFile = UploadedFile::getInstance($model, 'fotoFile');
+
+            if($model->validate() && !empty($model->fotoFile) && !empty($model->cvFile)){
+                $nama2 = 'cv-'.$model->user_id.'.'.$model->cvFile->extension;;
+                $model->cv = $nama2;
+                $nama1 = 'foto-'.$model->user_id.'.'.$model->fotoFile->extension;;
+                $model->foto = $nama1;
+                $model->save();
+                $model->cvFile->saveAs('cv/'.$nama2);            
+                $model->fotoFile->saveAs('foto/'.$nama1);
+            }
+            else if($model->validate() && !empty($model->fotoFile)){
+                $nama1 = 'foto-'.$model->user_id.'.'.$model->fotoFile->extension;
+                $model->foto = $nama1;
+                $model->save();
+                $model->fotoFile->saveAs('foto/'.$nama1);
+            }
+            else if($model->validate() && !empty($model->cvFile)){
+                $nama2 = 'cv-'.$model->user_id.'.'.$model->cvFile->extension;;
+                $model->cv = $nama2;
+                $model->save();
+                $model->cvFile->saveAs('cv/'.$nama2);
+            }
+            else{
+                $model->save();
+            }            
+
+            \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'Profil guru berhasil diperbaharui'));
+            $this->trigger(self::EVENT_AFTER_TEACHER_UPDATE, $event);
+            return $this->refresh();
+        }
+
+        return $this->render('teacher', [
+            'model' => $model,
+        ]);
     }
 }
